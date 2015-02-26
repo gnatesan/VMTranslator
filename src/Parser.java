@@ -8,22 +8,21 @@ import java.util.StringTokenizer;
 
 public class Parser {
 	
-	File file;
+	String fileName;
 	Scanner in;
 	String currentCommand;
 	String commandType;
-	String argument1;
-	int argument2;
+	String commandKey;
+	String nextLine;
+	boolean validCommand;
 	StringTokenizer st;
 	HashMap <String, String> allCommands;
-	CodeWriter cw;
 	
 	
-	public Parser(String filename) {
-		file = new File(filename);
+	public Parser(File file) {
 		try {
+			fileName = file.getName();
 			in = new Scanner(file);
-			cw = new CodeWriter(new File("out.asm"));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -48,23 +47,38 @@ public class Parser {
 	}
 	
 	public boolean hasMoreCommands() {
-		if (in.hasNext() && in.hasNextLine()) {
-			return true;
+		while (in.hasNext() && in.hasNextLine()) {
+			nextLine = in.nextLine();
+			System.out.println("next line is " + nextLine);
+			if (isValidCommand(nextLine)) {
+				return true;
+			}
 		}
 		return false;
 	}
 	
-	public void advance() {
-		if (hasMoreCommands()) {
-			this.currentCommand = in.nextLine();
-			//System.out.println(currentCommand);
+	public boolean isValidCommand(String test) {
+		CharSequence space = "//";
+		if(test.contains(space)) {
+			test = test.substring(0, nextLine.indexOf('/'));
 		}
-
+		if (test.trim().length() != 0) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	
+	public void advance() {
+		this.currentCommand = nextLine;
+		System.out.println("current command is: " + currentCommand);
 	}
 	
 	public String commandType() {
 		st = new StringTokenizer(currentCommand);
-		return allCommands.get(st.nextToken());
+		commandKey = st.nextToken();
+		return allCommands.get(commandKey);
 	}
 	
 	public String arg1() {
@@ -79,26 +93,36 @@ public class Parser {
 		st.nextToken();
 		return Integer.parseInt(st.nextToken());
 	}
+
+	public String getCommandKey() {
+		return commandKey;
+	}
+
+	public String getFileName() {
+		return fileName;
+	}
 	
-	public void writeOutput() throws IOException {
+	/*public void writeOutput() throws IOException {
 		commandType = commandType();
-		argument1 = arg1();
 		if (commandType.equals("C_PUSH") || commandType.equals("C_POP")) {
+			argument1 = arg1();
 			argument2 = arg2();
 			cw.WritePushPop(commandType, argument1, argument2);
+			System.out.println("p");
 		}
-	}
+		else if (commandType.equals("C_ARITHMETIC")) {
+			cw.writeArithmetic(commandKey);
+			System.out.println("a");
+		}
+	}*/
 	
-	public void close() throws IOException {
-		cw.Close();
-	}
 	
-	public static void main (String[] args) throws IOException {
+	/*public static void main (String[] args) throws IOException {
 		Parser p = new Parser("test.txt");
 		while (p.hasMoreCommands()) {
 			p.advance();
 			p.writeOutput();
 		}
 		p.close();
-	}
+	}*/
 }
