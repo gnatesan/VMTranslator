@@ -5,14 +5,13 @@ import java.util.Stack;
 
 public class CodeWriter {
 	FileWriter fw;
-	//Stack <Integer> s;
 	int temp1;
 	int temp2;
 	String staticSubString;
 	
 	public CodeWriter(File outfile) throws IOException {
 		fw = new FileWriter(outfile);
-		staticSubString = outfile.getName().replace(".vm", "."); //i.e. SimpleAdd.
+		staticSubString = outfile.getName().replace(".vm", "."); //i.e. SimpleAdd.vm -> SimpleAdd.
 	}
 
 	public void setFileName(String fileName) throws IOException {
@@ -23,21 +22,14 @@ public class CodeWriter {
 	public void writeArithmetic(String command) throws IOException {
 		switch(command) {
 		case("add"): {
-			fw.write("@SP");
-			fw.write(System.lineSeparator());
-			fw.write("M = M - 1");
-			fw.write(System.lineSeparator());
-			fw.write("A = M"); //go to address of number on top of stack
-			fw.write(System.lineSeparator());
-			fw.write("D = M"); //make the d register contain that number
-			fw.write(System.lineSeparator());
+			popCommand(); //pop what's on top of stack, put in D register
 			fw.write("@SP");
 			fw.write(System.lineSeparator());
 			fw.write("M = M - 1");
 			fw.write(System.lineSeparator());
 			fw.write("A = M"); //go to address of next highest number on stack
 			fw.write(System.lineSeparator());
-			fw.write("M = M + D"); //make that address contain the number added to what is in d register
+			fw.write("M = M + D"); //make that address contain the number added to what is in D register
 			fw.write(System.lineSeparator());
 			fw.write("@SP");
 			fw.write(System.lineSeparator());
@@ -46,13 +38,7 @@ public class CodeWriter {
 			break;
 		}
 		case("sub"): {
-			fw.write("@SP");
-			fw.write(System.lineSeparator());
-			fw.write("M = M - 1");
-			fw.write(System.lineSeparator());
-			fw.write("A = M"); //go to address of number on top of stack
-			fw.write(System.lineSeparator());
-			fw.write("D = M"); //make the d register contain that number
+			popCommand(); //pop what's on top of stack, put in D register
 			fw.write(System.lineSeparator());
 			fw.write("@SP");
 			fw.write(System.lineSeparator());
@@ -159,20 +145,57 @@ public class CodeWriter {
 			break;
 		}	
 		case("or"): {
-			popCommand();
-			
+			popCommand(); //pop what's on top of stack and put in D register
+			fw.write("@R13");
+			fw.write(System.lineSeparator());
+			fw.write("M = D"); //store what's in D register into Mem[R13]
+			fw.write(System.lineSeparator());
+			popCommand(); //pop next highest item on stack and put in D register
+			fw.write("@R13");
+			fw.write(System.lineSeparator());
+			fw.write("D = D | M"); //complete the OR operation, store in D register
+			fw.write(System.lineSeparator());
+			pushCommand(); //push what's in register D onto top of stack, increment stack pointer
 			break;
 		}
 		case("and"): {
 			popCommand();
+			fw.write("@R13");
+			fw.write(System.lineSeparator());
+			fw.write("M = D"); //store what's in D register into Mem[R13]
+			fw.write(System.lineSeparator());
+			popCommand(); //pop next highest item on stack and put in D register
+			fw.write("@R13");
+			fw.write(System.lineSeparator());
+			fw.write("D = D & M"); //complete the AND operation, store in D register
+			fw.write(System.lineSeparator());
+			pushCommand(); //push what's in register D onto top of stack, increment stack pointer
 			break;
 		}
 		case("not"): {
-			popCommand();
+			popCommand(); //pop what's on top of stack and put in D register
+			fw.write("D = ^D"); //not value in D register
+			fw.write(System.lineSeparator());
+			pushCommand(); //push value in D register onto top of stack
 			break;
 		}
-		case("neg"): {
-			popCommand();
+		case("neg"): { //do you modify the number you are negating, and then update stack pointer back up?
+			/*fw.write("@SP");
+			fw.write(System.lineSeparator());
+			fw.write("M = M - 1");
+			fw.write(System.lineSeparator());
+			fw.write("A = M");
+			fw.write(System.lineSeparator());
+			fw.write("M = -M");
+			fw.write(System.lineSeparator());
+			fw.write("@SP");
+			fw.write(System.lineSeparator());
+			fw.write("M = M + 1");
+			fw.write(System.lineSeparator());*/
+			popCommand(); //pop what's on top of stack and put in D register
+			fw.write("D = -D"); //negate value in D register
+			fw.write(System.lineSeparator());
+			pushCommand(); //push value in D register onto top of stack
 			break;
 		}
 		}
@@ -422,6 +445,7 @@ public class CodeWriter {
 				fw.write(System.lineSeparator());
 				fw.write("M = D");
 				fw.write(System.lineSeparator());
+				break;
 			}
 			}
 		}

@@ -101,28 +101,5 @@ public class Parser {
 	public String getFileName() {
 		return fileName;
 	}
-	
-	/*public void writeOutput() throws IOException {
-		commandType = commandType();
-		if (commandType.equals("C_PUSH") || commandType.equals("C_POP")) {
-			argument1 = arg1();
-			argument2 = arg2();
-			cw.WritePushPop(commandType, argument1, argument2);
-			System.out.println("p");
-		}
-		else if (commandType.equals("C_ARITHMETIC")) {
-			cw.writeArithmetic(commandKey);
-			System.out.println("a");
-		}
-	}*/
-	
-	
-	/*public static void main (String[] args) throws IOException {
-		Parser p = new Parser("test.txt");
-		while (p.hasMoreCommands()) {
-			p.advance();
-			p.writeOutput();
-		}
-		p.close();
-	}*/
+
 }
