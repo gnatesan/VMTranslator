@@ -12,7 +12,7 @@ public class CodeWriter {
 	
 	public CodeWriter(File outfile) throws IOException {
 		fw = new FileWriter(outfile);
-		staticSubString = outfile.getName().replace(".vm", ".");
+		staticSubString = outfile.getName().replace(".vm", "."); //i.e. SimpleAdd.
 	}
 
 	public void setFileName(String fileName) throws IOException {
@@ -186,6 +186,7 @@ public class CodeWriter {
 				fw.write(System.lineSeparator());
 				fw.write("D = A");
 				fw.write(System.lineSeparator());
+				break;
 			}
 			case ("local"): { //push local offset
 				fw.write("@" + Integer.toString(index));
@@ -200,6 +201,7 @@ public class CodeWriter {
 				fw.write(System.lineSeparator());
 				fw.write("D = M"); //set D register to what is contained in the memory location, which is what will be pushed on stack
 				fw.write(System.lineSeparator());
+				break;
 			}
 			case ("argument"): { //push argument offset
 				fw.write("@" + Integer.toString(index));
@@ -214,6 +216,7 @@ public class CodeWriter {
 				fw.write(System.lineSeparator());
 				fw.write("D = M"); //set D register to what is contained in the memory location, which is what will be pushed on stack
 				fw.write(System.lineSeparator());
+				break;
 			}
 			case ("this"): { //push this offset
 				fw.write("@" + Integer.toString(index));
@@ -228,6 +231,7 @@ public class CodeWriter {
 				fw.write(System.lineSeparator());
 				fw.write("D = M"); //set D register to what is contained in the memory location, which is what will be pushed on stack
 				fw.write(System.lineSeparator());
+				break;
 			}
 			case ("that"): { //push that offset
 				fw.write("@" + Integer.toString(index));
@@ -242,6 +246,7 @@ public class CodeWriter {
 				fw.write(System.lineSeparator());
 				fw.write("D = M"); //set D register to what is contained in the memory location, which is what will be pushed on stack
 				fw.write(System.lineSeparator());
+				break;
 			}
 			case ("pointer"): { //CONFUSED ABOUT THIS, SHOULD I ADD MEM[THIS] + OFFSET OR ADD 3 + OFFSET, LOOK IN BOOK
 				fw.write("@" + Integer.toString(index));
@@ -256,6 +261,7 @@ public class CodeWriter {
 				fw.write(System.lineSeparator());
 				fw.write("D = M"); //set D register to what is contained in the memory location, which is what will be pushed on stack
 				fw.write(System.lineSeparator());
+				break;
 			}
 			case ("temp"): {
 				fw.write("@" + Integer.toString(index));
@@ -270,20 +276,153 @@ public class CodeWriter {
 				fw.write(System.lineSeparator());
 				fw.write("D = M"); //set D register to what is contained in the memory location, which is what will be pushed on stack
 				fw.write(System.lineSeparator());
+				break;
 			}
 			case ("static"): { //push static 3
-				staticSubString += Integer.toString(index);
-				fw.write("@" + staticSubString); //go to static address of offset, A = SimpleAdd.3
+				fw.write("@" + staticSubString + Integer.toString(index)); //go to static address of offset, A = SimpleAdd.3
 				fw.write(System.lineSeparator());
 				fw.write("D = M"); //set D register to what is contained in the memory location, which is what will be pushed on stack
 				fw.write(System.lineSeparator());
+				break;
 			}
 			}
 			this.pushCommand(); //push value in D register onto stack
 		}
 		else {
 			switch(segment) {
-			
+			case ("local"): { //pop local offset
+				fw.write("@" + Integer.toString(index)); 
+				fw.write(System.lineSeparator());
+				fw.write("D = A"); //D register contains offset
+				fw.write(System.lineSeparator());
+				fw.write("@LCL");
+				fw.write(System.lineSeparator());
+				fw.write("D = D + M"); //D register contains offset + Mem[LCL], another memory location
+				fw.write(System.lineSeparator());
+				fw.write("@R13");
+				fw.write("M = D"); //M[R13] = offset + Mem[LCL], memory location we will need to add popped item to
+				fw.write(System.lineSeparator());
+				this.popCommand(); //D register contains value on top of stack
+				fw.write("@R13");
+				fw.write(System.lineSeparator());
+				fw.write("A = M"); //A = offset + Mem[LCL]
+				fw.write(System.lineSeparator());
+				fw.write("M = D"); //memory contains what was popped off of stack
+				fw.write(System.lineSeparator());
+				break;
+			}
+			case ("argument"): { //pop argument offset
+				fw.write("@" + Integer.toString(index)); 
+				fw.write(System.lineSeparator());
+				fw.write("D = A"); //D register contains offset
+				fw.write(System.lineSeparator());
+				fw.write("@ARG");
+				fw.write(System.lineSeparator());
+				fw.write("D = D + M"); //D register contains offset + Mem[ARG], another memory location
+				fw.write(System.lineSeparator());
+				fw.write("@R13");
+				fw.write("M = D"); //M[R13] = offset + Mem[ARG], memory location we will need to add popped item to
+				fw.write(System.lineSeparator());
+				this.popCommand(); //D register contains value on top of stack
+				fw.write("@R13");
+				fw.write(System.lineSeparator());
+				fw.write("A = M"); //A = offset + Mem[ARG] 
+				fw.write(System.lineSeparator());
+				fw.write("M = D"); //memory contains what was popped off of stack
+				fw.write(System.lineSeparator());
+				break;
+			}
+			case ("this"): { //pop this offset
+				fw.write("@" + Integer.toString(index)); 
+				fw.write(System.lineSeparator());
+				fw.write("D = A"); //D register contains offset
+				fw.write(System.lineSeparator());
+				fw.write("@THIS");
+				fw.write(System.lineSeparator());
+				fw.write("D = D + M"); //D register contains offset + Mem[THIS], another memory location
+				fw.write(System.lineSeparator());
+				fw.write("@R13");
+				fw.write("M = D"); //M[R13] = offset + Mem[THIS], memory location we will need to add popped item to
+				fw.write(System.lineSeparator());
+				this.popCommand(); //D register contains value on top of stack
+				fw.write("@R13");
+				fw.write(System.lineSeparator());
+				fw.write("A = M"); //A = offset + Mem[THIS] 
+				fw.write(System.lineSeparator());
+				fw.write("M = D"); //memory contains what was popped off of stack
+				fw.write(System.lineSeparator());
+				break;
+			}
+			case ("that"): { //pop argument offset
+				fw.write("@" + Integer.toString(index)); 
+				fw.write(System.lineSeparator());
+				fw.write("D = A"); //D register contains offset
+				fw.write(System.lineSeparator());
+				fw.write("@THAT");
+				fw.write(System.lineSeparator());
+				fw.write("D = D + M"); //D register contains offset + Mem[THAT], another memory location
+				fw.write(System.lineSeparator());
+				fw.write("@R13");
+				fw.write("M = D"); //M[R13] = offset + Mem[THAT], memory location we will need to add popped item to
+				fw.write(System.lineSeparator());
+				this.popCommand(); //D register contains value on top of stack
+				fw.write("@R13");
+				fw.write(System.lineSeparator());
+				fw.write("A = M"); //A = offset + Mem[THAT] 
+				fw.write(System.lineSeparator());
+				fw.write("M = D"); //memory contains what was popped off of stack
+				fw.write(System.lineSeparator());
+				break;
+			}
+			case ("pointer"): {//pop pointer offset, CONFUSED ABOUT THIS SAME PROBLEM AS PUSH POINTER
+				fw.write("@" + Integer.toString(index)); 
+				fw.write(System.lineSeparator());
+				fw.write("D = A"); //D register contains offset
+				fw.write(System.lineSeparator());
+				fw.write("@THIS");
+				fw.write(System.lineSeparator());
+				fw.write("D = D + M"); //D register contains offset + Mem[THIS], another memory location
+				fw.write(System.lineSeparator());
+				fw.write("@R13");
+				fw.write("M = D"); //M[R13] = offset + Mem[THIS], memory location we will need to add popped item to
+				fw.write(System.lineSeparator());
+				this.popCommand(); //D register contains value on top of stack
+				fw.write("@R13");
+				fw.write(System.lineSeparator());
+				fw.write("A = M"); //A = offset + Mem[THIS] 
+				fw.write(System.lineSeparator());
+				fw.write("M = D"); //memory contains what was popped off of stack
+				fw.write(System.lineSeparator());
+				break;
+			}
+			case ("temp"): { //pop temp offset 
+				fw.write("@" + Integer.toString(index)); 
+				fw.write(System.lineSeparator());
+				fw.write("D = A"); //D register contains offset
+				fw.write(System.lineSeparator());
+				fw.write("@R5"); //go to first address of temp segment
+				fw.write(System.lineSeparator());
+				fw.write("D = D + M"); //D register contains offset + Mem[THIS], another memory location
+				fw.write(System.lineSeparator());
+				fw.write("@R13");
+				fw.write("M = D"); //M[R13] = offset + Mem[R5], memory location we will need to add popped item to
+				fw.write(System.lineSeparator());
+				this.popCommand(); //D register contains value on top of stack
+				fw.write("@R13");
+				fw.write(System.lineSeparator());
+				fw.write("A = M"); //A = offset + Mem[R5] 
+				fw.write(System.lineSeparator());
+				fw.write("M = D"); //memory contains what was popped off of stack
+				fw.write(System.lineSeparator());
+				break;
+			}
+			case ("static"): { //pop static 2
+				this.popCommand();
+				fw.write("@" + staticSubString + Integer.toString(index)); //go to static address of offset, A = SimpleAdd.2
+				fw.write(System.lineSeparator());
+				fw.write("M = D");
+				fw.write(System.lineSeparator());
+			}
 			}
 		}
 	}
