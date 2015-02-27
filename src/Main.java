@@ -19,8 +19,8 @@ public class Main {
 		if (fileName.isFile()) {
 			System.out.println("true");
 			p = new Parser(fileName);
-			//outFile = fileName.getName().replace(".vm", ".asm");
-			outFile = "out1.asm";
+			outFile = fileName.getName().replace(".vm", ".asm");
+			//outFile = "out1.asm";
 			cw = new CodeWriter(new File(outFile));
 		}
 		else if (fileName.isDirectory()) {
@@ -68,13 +68,13 @@ public class Main {
 		}
 		else if (commandType.equals("C_ARITHMETIC")) {
 			cw.writeArithmetic(use.getCommandKey());
-			System.out.println("a");
+			//System.out.println("a");
 		}
 	}
 	
 	public static void main(String[] args) {
 		//File f = new File(args[0]);
-		File f = new File("test.txt");
+		File f = new File("StaticTest.vm");
 		try {
 			Main m = new Main(f);
 			m.runProgram();

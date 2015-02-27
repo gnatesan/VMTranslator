@@ -6,6 +6,5 @@
 //push constant 19
 //lt
 
-push constant 15
-push constant 7
-gt
+push temp 3
+pop temp 3

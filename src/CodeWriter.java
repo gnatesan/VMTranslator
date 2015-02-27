@@ -8,15 +8,18 @@ public class CodeWriter {
 	int temp1;
 	int temp2;
 	String staticSubString;
+	int countEQ = 0;
+	int countLT = 0;
+	int countGT = 0;
 	
 	public CodeWriter(File outfile) throws IOException {
 		fw = new FileWriter(outfile);
-		staticSubString = outfile.getName().replace(".vm", "."); //i.e. SimpleAdd.vm -> SimpleAdd.
+		staticSubString = outfile.getName().replace(".asm", "."); //i.e. SimpleAdd.vm -> SimpleAdd.
 	}
 
 	public void setFileName(String fileName) throws IOException {
 		fw = new FileWriter(new File(fileName));
-		staticSubString = fileName.replace(".vm", "."); //update static substring as new file is being written to
+		staticSubString = fileName.replace(".asm", "."); //update static substring as new file is being written to
 	}
 	
 	public void writeArithmetic(String command) throws IOException {
@@ -39,19 +42,16 @@ public class CodeWriter {
 		}
 		case("sub"): {
 			popCommand(); //pop what's on top of stack, put in D register
+			fw.write("@R13");
 			fw.write(System.lineSeparator());
-			fw.write("@SP");
+			fw.write("M = D");
 			fw.write(System.lineSeparator());
-			fw.write("M = M - 1");
+			popCommand();
+			fw.write("@R13");
 			fw.write(System.lineSeparator());
-			fw.write("A = M"); //go to address of next highest number on stack
+			fw.write("D = D - M");
 			fw.write(System.lineSeparator());
-			fw.write("M = M - D"); //make that address contain the number subtracted from what is in d register
-			fw.write(System.lineSeparator());
-			fw.write("@SP");
-			fw.write(System.lineSeparator());
-			fw.write("M = M + 1"); //increment stack pointer by 1
-			fw.write(System.lineSeparator());
+			pushCommand();
 			break;
 		}	
 		case("eq"): {
@@ -65,23 +65,24 @@ public class CodeWriter {
 			fw.write(System.lineSeparator());
 			fw.write("D = D - M"); //what was popped off 2nd - what was popped off first, store in D register
 			fw.write(System.lineSeparator());
-			fw.write("@IF_NOTEQ_N"); 
+			fw.write("@IF_NOTEQ_" + Integer.toString(countEQ)); 
 			fw.write(System.lineSeparator());
 			fw.write("D;JNE"); //if D register is not equal to 0, jump to label
 			fw.write(System.lineSeparator());
 			fw.write("D = -1"); //since D register is equal to 0, set to -1 because comparison is true
 			fw.write(System.lineSeparator());
-			fw.write("@IF_NOTEQ_END_N");
+			fw.write("@IF_NOTEQ_END_" + Integer.toString(countEQ));
 			fw.write(System.lineSeparator());
 			fw.write("0;JMP"); //jump to label
 			fw.write(System.lineSeparator());
-			fw.write("(IF_NOTEQ_N)");
+			fw.write("(IF_NOTEQ_" + Integer.toString(countEQ) + ")");
 			fw.write(System.lineSeparator());
 			fw.write("D = 0"); //since D register isn't equal to 0, set to 0 because comparison is false
 			fw.write(System.lineSeparator());
-			fw.write("(IF_NOTEQ_END_N)");
+			fw.write("(IF_NOTEQ_END_" + Integer.toString(countEQ) + ")");
 			fw.write(System.lineSeparator());
 			pushCommand(); //push what's in register D onto top of stack, increment stack pointer
+			++countEQ;
 			break;
 		}	
 		case("lt"): {
@@ -95,23 +96,24 @@ public class CodeWriter {
 			fw.write(System.lineSeparator());
 			fw.write("D = D - M"); //what was popped off 2nd - what was popped off first, store in D register
 			fw.write(System.lineSeparator());
-			fw.write("@IF_LT_N"); 
+			fw.write("@IF_LT_" + Integer.toString(countLT)); 
 			fw.write(System.lineSeparator());
 			fw.write("D;JLT"); //if D register is less than 0, jump to label
 			fw.write(System.lineSeparator());
 			fw.write("D = 0"); //since D register isn't less than 0, set to 0 because comparison is false
 			fw.write(System.lineSeparator());
-			fw.write("@IF_NOTLT_END_N");
+			fw.write("@IF_NOTLT_END_" + Integer.toString(countLT));
 			fw.write(System.lineSeparator());
 			fw.write("0;JMP"); //jump to label
 			fw.write(System.lineSeparator());
-			fw.write("(IF_LT_N)");
+			fw.write("(IF_LT_" + Integer.toString(countLT) + ")");
 			fw.write(System.lineSeparator());
 			fw.write("D = -1"); //since D register is less than 0, set to -1 because comparison is true
 			fw.write(System.lineSeparator());
-			fw.write("(IF_NOTLT_END_N)");
+			fw.write("(IF_NOTLT_END_" + Integer.toString(countLT) + ")");
 			fw.write(System.lineSeparator());
 			pushCommand(); //push what's in register D onto top of stack, increment stack pointer
+			++countLT;
 			break;
 		}
 		case("gt"): {
@@ -125,23 +127,24 @@ public class CodeWriter {
 			fw.write(System.lineSeparator());
 			fw.write("D = D - M"); //what was popped off 2nd - what was popped off first, store in D register
 			fw.write(System.lineSeparator());
-			fw.write("@IF_GT_N"); 
+			fw.write("@IF_GT_" + Integer.toString(countGT)); 
 			fw.write(System.lineSeparator());
-			fw.write("D:JGT"); //if D register is greater than 0, jump to label
+			fw.write("D;JGT"); //if D register is greater than 0, jump to label
 			fw.write(System.lineSeparator());
 			fw.write("D = 0"); //since D register isn't less than 0, set to 0 because comparison is false
 			fw.write(System.lineSeparator());
-			fw.write("@IF_NOTGT_END_N");
+			fw.write("@IF_NOTGT_END_" + Integer.toString(countGT));
 			fw.write(System.lineSeparator());
 			fw.write("0;JMP"); //jump to label
 			fw.write(System.lineSeparator());
-			fw.write("(IF_GT_N)");
+			fw.write("(IF_GT_" + Integer.toString(countGT) + ")");
 			fw.write(System.lineSeparator());
 			fw.write("D = -1"); //since D register is greater than 0, set to -1 because comparison is true
 			fw.write(System.lineSeparator());
-			fw.write("(IF_NOTGT_END_N)");
+			fw.write("(IF_NOTGT_END_" + Integer.toString(countGT) + ")");
 			fw.write(System.lineSeparator());
 			pushCommand(); //push what's in register D onto top of stack, increment stack pointer
+			++countGT;
 			break;
 		}	
 		case("or"): {
@@ -174,7 +177,7 @@ public class CodeWriter {
 		}
 		case("not"): {
 			popCommand(); //pop what's on top of stack and put in D register
-			fw.write("D = ^D"); //not value in D register
+			fw.write("D = !D"); //not value in D register
 			fw.write(System.lineSeparator());
 			pushCommand(); //push value in D register onto top of stack
 			break;
@@ -271,34 +274,30 @@ public class CodeWriter {
 				fw.write(System.lineSeparator());
 				break;
 			}
-			case ("pointer"): { //CONFUSED ABOUT THIS, SHOULD I ADD MEM[THIS] + OFFSET OR ADD 3 + OFFSET, LOOK IN BOOK
-				fw.write("@" + Integer.toString(index));
+			case ("pointer"): { //push pointer offset
+				if (index == 0) {
+					fw.write("@THIS");
+					fw.write(System.lineSeparator());
+				}
+				else {
+					fw.write("@THAT");
+					fw.write(System.lineSeparator());
+				}
+				//fw.write("A = M");
+				//fw.write(System.lineSeparator());
+				fw.write("D = M");
 				fw.write(System.lineSeparator());
-				fw.write("D = A"); //D register contains the offset
-				fw.write(System.lineSeparator());
-				fw.write("@THIS");
-				fw.write(System.lineSeparator());
-				fw.write("D = D + M");
-				fw.write(System.lineSeparator());
-				fw.write("A = D"); //set address to what's in D register, which is memory location you will push from
-				fw.write(System.lineSeparator());
-				fw.write("D = M"); //set D register to what is contained in the memory location, which is what will be pushed on stack
-				fw.write(System.lineSeparator());
+				//this.pushCommand();
 				break;
 			}
-			case ("temp"): {
-				fw.write("@" + Integer.toString(index));
+			case ("temp"): { //push temp 5
+				fw.write("@R" + Integer.toString(index + 5));
 				fw.write(System.lineSeparator());
-				fw.write("D = A"); //D register contains the offset
+				//fw.write("A = M");
+				//fw.write(System.lineSeparator());
+				fw.write("D = M");
 				fw.write(System.lineSeparator());
-				fw.write("@R5"); //go to first address of temp segment
-				fw.write(System.lineSeparator());
-				fw.write("D = D + A"); //D register contains R5 + offset, another memory location
-				fw.write(System.lineSeparator());
-				fw.write("A = D"); //set address to what's in D register, which is memory location you will push from
-				fw.write(System.lineSeparator());
-				fw.write("D = M"); //set D register to what is contained in the memory location, which is what will be pushed on stack
-				fw.write(System.lineSeparator());
+				//this.pushCommand();
 				break;
 			}
 			case ("static"): { //push static 3
@@ -323,6 +322,7 @@ public class CodeWriter {
 				fw.write("D = D + M"); //D register contains offset + Mem[LCL], another memory location
 				fw.write(System.lineSeparator());
 				fw.write("@R13");
+				fw.write(System.lineSeparator());
 				fw.write("M = D"); //M[R13] = offset + Mem[LCL], memory location we will need to add popped item to
 				fw.write(System.lineSeparator());
 				this.popCommand(); //D register contains value on top of stack
@@ -344,6 +344,7 @@ public class CodeWriter {
 				fw.write("D = D + M"); //D register contains offset + Mem[ARG], another memory location
 				fw.write(System.lineSeparator());
 				fw.write("@R13");
+				fw.write(System.lineSeparator());
 				fw.write("M = D"); //M[R13] = offset + Mem[ARG], memory location we will need to add popped item to
 				fw.write(System.lineSeparator());
 				this.popCommand(); //D register contains value on top of stack
@@ -365,6 +366,7 @@ public class CodeWriter {
 				fw.write("D = D + M"); //D register contains offset + Mem[THIS], another memory location
 				fw.write(System.lineSeparator());
 				fw.write("@R13");
+				fw.write(System.lineSeparator());
 				fw.write("M = D"); //M[R13] = offset + Mem[THIS], memory location we will need to add popped item to
 				fw.write(System.lineSeparator());
 				this.popCommand(); //D register contains value on top of stack
@@ -386,6 +388,7 @@ public class CodeWriter {
 				fw.write("D = D + M"); //D register contains offset + Mem[THAT], another memory location
 				fw.write(System.lineSeparator());
 				fw.write("@R13");
+				fw.write(System.lineSeparator());
 				fw.write("M = D"); //M[R13] = offset + Mem[THAT], memory location we will need to add popped item to
 				fw.write(System.lineSeparator());
 				this.popCommand(); //D register contains value on top of stack
@@ -397,29 +400,31 @@ public class CodeWriter {
 				fw.write(System.lineSeparator());
 				break;
 			}
-			case ("pointer"): {//pop pointer offset, CONFUSED ABOUT THIS SAME PROBLEM AS PUSH POINTER
-				fw.write("@" + Integer.toString(index)); 
-				fw.write(System.lineSeparator());
-				fw.write("D = A"); //D register contains offset
-				fw.write(System.lineSeparator());
-				fw.write("@THIS");
-				fw.write(System.lineSeparator());
-				fw.write("D = D + M"); //D register contains offset + Mem[THIS], another memory location
-				fw.write(System.lineSeparator());
-				fw.write("@R13");
-				fw.write("M = D"); //M[R13] = offset + Mem[THIS], memory location we will need to add popped item to
-				fw.write(System.lineSeparator());
-				this.popCommand(); //D register contains value on top of stack
-				fw.write("@R13");
-				fw.write(System.lineSeparator());
-				fw.write("A = M"); //A = offset + Mem[THIS] 
-				fw.write(System.lineSeparator());
-				fw.write("M = D"); //memory contains what was popped off of stack
+			case ("pointer"): {//pop pointer offset
+				this.popCommand();
+				if (index == 0) {
+					//System.out.println("reached this");
+					fw.write("@THIS");
+					fw.write(System.lineSeparator());
+				}
+				else {
+					fw.write("@THAT");
+					fw.write(System.lineSeparator());
+				}
+				//fw.write("A = M");
+				//fw.write(System.lineSeparator());
+				fw.write("M = D");
 				fw.write(System.lineSeparator());
 				break;
 			}
 			case ("temp"): { //pop temp offset 
-				fw.write("@" + Integer.toString(index)); 
+				popCommand();
+				fw.write(System.lineSeparator());
+				fw.write("@R" + Integer.toString(index + 5));
+				fw.write(System.lineSeparator());
+				fw.write("M = D");
+				fw.write(System.lineSeparator());
+				/*fw.write("@" + Integer.toString(index)); 
 				fw.write(System.lineSeparator());
 				fw.write("D = A"); //D register contains offset
 				fw.write(System.lineSeparator());
@@ -428,6 +433,7 @@ public class CodeWriter {
 				fw.write("D = D + M"); //D register contains offset + Mem[THIS], another memory location
 				fw.write(System.lineSeparator());
 				fw.write("@R13");
+				fw.write(System.lineSeparator());
 				fw.write("M = D"); //M[R13] = offset + Mem[R5], memory location we will need to add popped item to
 				fw.write(System.lineSeparator());
 				this.popCommand(); //D register contains value on top of stack
@@ -436,7 +442,7 @@ public class CodeWriter {
 				fw.write("A = M"); //A = offset + Mem[R5] 
 				fw.write(System.lineSeparator());
 				fw.write("M = D"); //memory contains what was popped off of stack
-				fw.write(System.lineSeparator());
+				fw.write(System.lineSeparator());*/
 				break;
 			}
 			case ("static"): { //pop static 2

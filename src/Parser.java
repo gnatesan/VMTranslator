@@ -49,7 +49,7 @@ public class Parser {
 	public boolean hasMoreCommands() {
 		while (in.hasNext() && in.hasNextLine()) {
 			nextLine = in.nextLine();
-			System.out.println("next line is " + nextLine);
+			//System.out.println("next line is " + nextLine);
 			if (isValidCommand(nextLine)) {
 				return true;
 			}
@@ -72,7 +72,7 @@ public class Parser {
 	
 	public void advance() {
 		this.currentCommand = nextLine;
-		System.out.println("current command is: " + currentCommand);
+		//System.out.println("current command is: " + currentCommand);
 	}
 	
 	public String commandType() {
