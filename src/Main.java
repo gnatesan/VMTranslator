@@ -64,17 +64,14 @@ public class Main {
 			argument1 = use.arg1();
 			argument2 = use.arg2();
 			cw.WritePushPop(commandType, argument1, argument2);
-			//System.out.println("p");
 		}
 		else if (commandType.equals("C_ARITHMETIC")) {
 			cw.writeArithmetic(use.getCommandKey());
-			//System.out.println("a");
 		}
 	}
 	
 	public static void main(String[] args) {
-		//File f = new File(args[0]);
-		File f = new File("StaticTest.vm");
+		File f = new File(args[0]);
 		try {
 			Main m = new Main(f);
 			m.runProgram();
