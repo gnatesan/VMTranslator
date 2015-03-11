@@ -8,6 +8,8 @@ public class CodeWriter {
 	int temp1;
 	int temp2;
 	String staticSubString;
+	String funcName;
+	String returnAddress = "return";
 	int countEQ = 0;
 	int countLT = 0;
 	int countGT = 0;
@@ -424,25 +426,6 @@ public class CodeWriter {
 				fw.write(System.lineSeparator());
 				fw.write("M = D");
 				fw.write(System.lineSeparator());
-				/*fw.write("@" + Integer.toString(index)); 
-				fw.write(System.lineSeparator());
-				fw.write("D = A"); //D register contains offset
-				fw.write(System.lineSeparator());
-				fw.write("@R5"); //go to first address of temp segment
-				fw.write(System.lineSeparator());
-				fw.write("D = D + M"); //D register contains offset + Mem[THIS], another memory location
-				fw.write(System.lineSeparator());
-				fw.write("@R13");
-				fw.write(System.lineSeparator());
-				fw.write("M = D"); //M[R13] = offset + Mem[R5], memory location we will need to add popped item to
-				fw.write(System.lineSeparator());
-				this.popCommand(); //D register contains value on top of stack
-				fw.write("@R13");
-				fw.write(System.lineSeparator());
-				fw.write("A = M"); //A = offset + Mem[R5] 
-				fw.write(System.lineSeparator());
-				fw.write("M = D"); //memory contains what was popped off of stack
-				fw.write(System.lineSeparator());*/
 				break;
 			}
 			case ("static"): { //pop static 2
@@ -454,6 +437,74 @@ public class CodeWriter {
 				break;
 			}
 			}
+		}
+	}
+	
+	//bootstrap code, initialize SP to RAM[256] and call Sys.init
+	public void writeInit() throws IOException {
+		fw.write("@SP");
+		fw.write(System.lineSeparator());
+		fw.write("M = 256");
+		fw.write(System.lineSeparator());
+		fw.write("call Sys.init");
+		fw.write(System.lineSeparator());
+	}
+	
+	//label name
+	public void writeLabel(String label) throws IOException { 
+		fw.write("(" + funcName + "$" + label + ")");
+		fw.write(System.lineSeparator());
+	}
+	
+	//goto label (unconditional jump)
+	public void writeGoto(String label) throws IOException { 
+		fw.write("@" + funcName + "$" + label);
+		fw.write(System.lineSeparator());
+		fw.write("0;JMP");
+		fw.write(System.lineSeparator());
+	}
+	
+	//if-goto label (conditional jump)
+	public void writeIf(String label) throws IOException { 
+		fw.write("@SP");
+		fw.write(System.lineSeparator());
+		fw.write("M = M - 1");
+		fw.write(System.lineSeparator());
+		fw.write("A = M");
+		fw.write(System.lineSeparator());
+		fw.write("D = M");
+		fw.write(System.lineSeparator());
+		fw.write("@" + funcName + "$" + label);
+		fw.write(System.lineSeparator());
+		fw.write("D;JNE");
+		fw.write(System.lineSeparator());
+	}
+	
+	public void writeCall(String functionName, int numArgs) throws IOException {
+		
+	}
+	
+	public void writeReturn() throws IOException {
+		fw.write("@" + funcName + returnAddress);
+		fw.write(System.lineSeparator());
+		fw.write("D = A");
+		fw.write(System.lineSeparator());
+		this.pushCommand();
+	}
+	
+	public void writeFunction(String functionName, int numLocals) throws IOException {
+		funcName = functionName;
+		//declare label for function entry
+		fw.write("(" + funcName + ")"); 
+		fw.write(System.lineSeparator());
+		//check if there are any local variables, if so set D register to 0
+		if (numLocals != 0) {
+			fw.write("D = 0");
+			fw.write(System.lineSeparator());
+		}
+		//if there are k local variables, push 0 onto stack k times
+		for (int i = numLocals; i != 0; i++) {
+			this.pushCommand();
 		}
 	}
 	

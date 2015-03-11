@@ -44,6 +44,7 @@ public class Parser {
 		allCommands.put("return", "C_RETURN");
 		allCommands.put("goto", "C_GOTO");
 		allCommands.put("if-goto", "C_IF");
+		allCommands.put("call", "C_CALL");
 	}
 	
 	public boolean hasMoreCommands() {

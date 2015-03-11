@@ -68,6 +68,31 @@ public class Main {
 		else if (commandType.equals("C_ARITHMETIC")) {
 			cw.writeArithmetic(use.getCommandKey());
 		}
+		else if (commandType.equals("C_LABEL")) {
+			argument1 = use.arg1();
+			cw.writeLabel(argument1);
+		}
+		else if (commandType.equals("C_FUNCTION")) {
+			argument1 = use.arg1();
+			argument2 = use.arg2();
+			cw.writeFunction(argument1, argument2);
+		}
+		else if (commandType.equals("C_RETURN")) {
+			cw.writeReturn();
+		}
+		else if (commandType.equals("C_GOTO")) {
+			argument1 = use.arg1();
+			cw.writeGoto(argument1);
+		}
+		else if (commandType.equals("C_IF")) {
+			argument1 = use.arg1();
+			cw.writeIf(argument1);
+		}
+		else if (commandType.equals("C_CALL")) {
+			argument1 = use.arg1();
+			argument2 = use.arg2();
+			cw.writeCall(argument1, argument2);
+		}
 	}
 	
 	public static void main(String[] args) {
