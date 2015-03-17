@@ -1,128 +1,68 @@
-@17
+@256
+D = A
+@SP
+M = D
+@Sys.initreturn0
 D = A
 @SP
 A = M
 M = D
 @SP
 M = M + 1
-@17
-D = A
+@LCL
+D = M
+@SP
+A = M
+M = D
+@SP
+M = M + 1
+@ARG
+D = M
+@SP
+A = M
+M = D
+@SP
+M = M + 1
+@THIS
+D = M
+@SP
+A = M
+M = D
+@SP
+M = M + 1
+@THAT
+D = M
 @SP
 A = M
 M = D
 @SP
 M = M + 1
 @SP
-M = M - 1
-A = M
 D = M
-@R13
+@5
+D = D - A
+@ARG
 M = D
 @SP
-M = M - 1
-A = M
 D = M
-@R13
-D = D - M
-@IF_NOTEQ_0
-D;JNE
-D = -1
-@IF_NOTEQ_END_0
+@LCL
+M = D
+@Sys.init
 0;JMP
-(IF_NOTEQ_0)
-D = 0
-(IF_NOTEQ_END_0)
-@SP
-A = M
-M = D
-@SP
-M = M + 1
-@17
+(Sys.initreturn0)
+(Main.fibonacci)
+@0
 D = A
-@SP
-A = M
-M = D
-@SP
-M = M + 1
-@16
-D = A
-@SP
-A = M
-M = D
-@SP
-M = M + 1
-@SP
-M = M - 1
-A = M
+@ARG
+D = D + M
+A = D
 D = M
-@R13
-M = D
-@SP
-M = M - 1
-A = M
-D = M
-@R13
-D = D - M
-@IF_NOTEQ_1
-D;JNE
-D = -1
-@IF_NOTEQ_END_1
-0;JMP
-(IF_NOTEQ_1)
-D = 0
-(IF_NOTEQ_END_1)
 @SP
 A = M
 M = D
 @SP
 M = M + 1
-@16
-D = A
-@SP
-A = M
-M = D
-@SP
-M = M + 1
-@17
-D = A
-@SP
-A = M
-M = D
-@SP
-M = M + 1
-@SP
-M = M - 1
-A = M
-D = M
-@R13
-M = D
-@SP
-M = M - 1
-A = M
-D = M
-@R13
-D = D - M
-@IF_NOTEQ_2
-D;JNE
-D = -1
-@IF_NOTEQ_END_2
-0;JMP
-(IF_NOTEQ_2)
-D = 0
-(IF_NOTEQ_END_2)
-@SP
-A = M
-M = D
-@SP
-M = M + 1
-@892
-D = A
-@SP
-A = M
-M = D
-@SP
-M = M + 1
-@891
+@2
 D = A
 @SP
 A = M
@@ -154,14 +94,91 @@ A = M
 M = D
 @SP
 M = M + 1
-@891
+@SP
+M = M - 1
+A = M
+D = M
+@Main.fibonacci$IF_TRUE
+D;JNE
+@Main.fibonacci$IF_FALSE
+0;JMP
+(Main.fibonacci$IF_TRUE)
+@0
 D = A
+@ARG
+D = D + M
+A = D
+D = M
 @SP
 A = M
 M = D
 @SP
 M = M + 1
-@892
+@LCL
+D = M
+@FRAME
+M = D
+@5
+D = D - A
+A = D
+D = M
+@RET
+M = D
+@SP
+M = M - 1
+A = M
+D = M
+@ARG
+A = M
+M = D
+@ARG
+D = M
+@SP
+M = D + 1
+@FRAME
+M = M - 1
+D = M
+A = D
+D = M
+@THAT
+M = D
+@FRAME
+M = M - 1
+D = M
+A = D
+D = M
+@THIS
+M = D
+@FRAME
+M = M - 1
+D = M
+A = D
+D = M
+@ARG
+M = D
+@FRAME
+M = M - 1
+D = M
+A = D
+D = M
+@LCL
+M = D
+@RET
+A = M
+0;JMP
+(Main.fibonacci$IF_FALSE)
+@0
+D = A
+@ARG
+D = D + M
+A = D
+D = M
+@SP
+A = M
+M = D
+@SP
+M = M + 1
+@2
 D = A
 @SP
 A = M
@@ -180,27 +197,71 @@ A = M
 D = M
 @R13
 D = D - M
-@IF_LT_1
-D;JLT
-D = 0
-@IF_NOTLT_END_1
-0;JMP
-(IF_LT_1)
-D = -1
-(IF_NOTLT_END_1)
 @SP
 A = M
 M = D
 @SP
 M = M + 1
-@891
+@Main.fibonaccireturn1
 D = A
 @SP
 A = M
 M = D
 @SP
 M = M + 1
-@891
+@LCL
+D = M
+@SP
+A = M
+M = D
+@SP
+M = M + 1
+@ARG
+D = M
+@SP
+A = M
+M = D
+@SP
+M = M + 1
+@THIS
+D = M
+@SP
+A = M
+M = D
+@SP
+M = M + 1
+@THAT
+D = M
+@SP
+A = M
+M = D
+@SP
+M = M + 1
+@SP
+D = M
+@6
+D = D - A
+@ARG
+M = D
+@SP
+D = M
+@LCL
+M = D
+@Main.fibonacci
+0;JMP
+(Main.fibonaccireturn1)
+@0
+D = A
+@ARG
+D = D + M
+A = D
+D = M
+@SP
+A = M
+M = D
+@SP
+M = M + 1
+@1
 D = A
 @SP
 A = M
@@ -219,157 +280,59 @@ A = M
 D = M
 @R13
 D = D - M
-@IF_LT_2
-D;JLT
-D = 0
-@IF_NOTLT_END_2
+@SP
+A = M
+M = D
+@SP
+M = M + 1
+@Main.fibonaccireturn2
+D = A
+@SP
+A = M
+M = D
+@SP
+M = M + 1
+@LCL
+D = M
+@SP
+A = M
+M = D
+@SP
+M = M + 1
+@ARG
+D = M
+@SP
+A = M
+M = D
+@SP
+M = M + 1
+@THIS
+D = M
+@SP
+A = M
+M = D
+@SP
+M = M + 1
+@THAT
+D = M
+@SP
+A = M
+M = D
+@SP
+M = M + 1
+@SP
+D = M
+@6
+D = D - A
+@ARG
+M = D
+@SP
+D = M
+@LCL
+M = D
+@Main.fibonacci
 0;JMP
-(IF_LT_2)
-D = -1
-(IF_NOTLT_END_2)
-@SP
-A = M
-M = D
-@SP
-M = M + 1
-@32767
-D = A
-@SP
-A = M
-M = D
-@SP
-M = M + 1
-@32766
-D = A
-@SP
-A = M
-M = D
-@SP
-M = M + 1
-@SP
-M = M - 1
-A = M
-D = M
-@R13
-M = D
-@SP
-M = M - 1
-A = M
-D = M
-@R13
-D = D - M
-@IF_GT_0
-D;JGT
-D = 0
-@IF_NOTGT_END_0
-0;JMP
-(IF_GT_0)
-D = -1
-(IF_NOTGT_END_0)
-@SP
-A = M
-M = D
-@SP
-M = M + 1
-@32766
-D = A
-@SP
-A = M
-M = D
-@SP
-M = M + 1
-@32767
-D = A
-@SP
-A = M
-M = D
-@SP
-M = M + 1
-@SP
-M = M - 1
-A = M
-D = M
-@R13
-M = D
-@SP
-M = M - 1
-A = M
-D = M
-@R13
-D = D - M
-@IF_GT_1
-D;JGT
-D = 0
-@IF_NOTGT_END_1
-0;JMP
-(IF_GT_1)
-D = -1
-(IF_NOTGT_END_1)
-@SP
-A = M
-M = D
-@SP
-M = M + 1
-@32766
-D = A
-@SP
-A = M
-M = D
-@SP
-M = M + 1
-@32766
-D = A
-@SP
-A = M
-M = D
-@SP
-M = M + 1
-@SP
-M = M - 1
-A = M
-D = M
-@R13
-M = D
-@SP
-M = M - 1
-A = M
-D = M
-@R13
-D = D - M
-@IF_GT_2
-D;JGT
-D = 0
-@IF_NOTGT_END_2
-0;JMP
-(IF_GT_2)
-D = -1
-(IF_NOTGT_END_2)
-@SP
-A = M
-M = D
-@SP
-M = M + 1
-@57
-D = A
-@SP
-A = M
-M = D
-@SP
-M = M + 1
-@31
-D = A
-@SP
-A = M
-M = D
-@SP
-M = M + 1
-@53
-D = A
-@SP
-A = M
-M = D
-@SP
-M = M + 1
+(Main.fibonaccireturn2)
 @SP
 M = M - 1
 A = M
@@ -380,88 +343,114 @@ A = M
 M = M + D
 @SP
 M = M + 1
-@112
+@LCL
+D = M
+@FRAME
+M = D
+@5
+D = D - A
+A = D
+D = M
+@RET
+M = D
+@SP
+M = M - 1
+A = M
+D = M
+@ARG
+A = M
+M = D
+@ARG
+D = M
+@SP
+M = D + 1
+@FRAME
+M = M - 1
+D = M
+A = D
+D = M
+@THAT
+M = D
+@FRAME
+M = M - 1
+D = M
+A = D
+D = M
+@THIS
+M = D
+@FRAME
+M = M - 1
+D = M
+A = D
+D = M
+@ARG
+M = D
+@FRAME
+M = M - 1
+D = M
+A = D
+D = M
+@LCL
+M = D
+@RET
+A = M
+0;JMP
+(Sys.init)
+@4
 D = A
 @SP
 A = M
 M = D
 @SP
 M = M + 1
-@SP
-M = M - 1
-A = M
-D = M
-@R13
-M = D
-@SP
-M = M - 1
-A = M
-D = M
-@R13
-D = D - M
-@SP
-A = M
-M = D
-@SP
-M = M + 1
-@SP
-M = M - 1
-A = M
-D = M
-D = -D
-@SP
-A = M
-M = D
-@SP
-M = M + 1
-@SP
-M = M - 1
-A = M
-D = M
-@R13
-M = D
-@SP
-M = M - 1
-A = M
-D = M
-@R13
-D = D & M
-@SP
-A = M
-M = D
-@SP
-M = M + 1
-@82
+@Main.fibonaccireturn3
 D = A
 @SP
 A = M
 M = D
 @SP
 M = M + 1
-@SP
-M = M - 1
-A = M
+@LCL
 D = M
-@R13
+@SP
+A = M
 M = D
 @SP
-M = M - 1
-A = M
+M = M + 1
+@ARG
 D = M
-@R13
-D = D | M
+@SP
+A = M
+M = D
+@SP
+M = M + 1
+@THIS
+D = M
+@SP
+A = M
+M = D
+@SP
+M = M + 1
+@THAT
+D = M
 @SP
 A = M
 M = D
 @SP
 M = M + 1
 @SP
-M = M - 1
-A = M
 D = M
-D = !D
-@SP
-A = M
+@6
+D = D - A
+@ARG
 M = D
 @SP
-M = M + 1
+D = M
+@LCL
+M = D
+@Main.fibonacci
+0;JMP
+(Main.fibonaccireturn3)
+(Sys.init$WHILE)
+@Sys.init$WHILE
+0;JMP

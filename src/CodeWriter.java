@@ -7,16 +7,17 @@ public class CodeWriter {
 	FileWriter fw;
 	int temp1;
 	int temp2;
-	String staticSubString;
+	String staticSubString = "";
 	String funcName;
 	String returnAddress = "return";
 	int countEQ = 0;
 	int countLT = 0;
 	int countGT = 0;
+	int countCall = 0;
 	
 	public CodeWriter(File outfile) throws IOException {
 		fw = new FileWriter(outfile);
-		staticSubString = outfile.getName().replace(".asm", "."); //i.e. SimpleAdd.vm -> SimpleAdd.
+		//staticSubString = outfile.getName().replace(".asm", "."); //i.e. SimpleAdd.vm -> SimpleAdd.
 	}
 
 	public void setFileName(String fileName) throws IOException {
@@ -442,12 +443,15 @@ public class CodeWriter {
 	
 	//bootstrap code, initialize SP to RAM[256] and call Sys.init
 	public void writeInit() throws IOException {
+		fw.write("@256");
+		fw.write(System.lineSeparator());
+		fw.write("D = A");
+		fw.write(System.lineSeparator());
 		fw.write("@SP");
 		fw.write(System.lineSeparator());
-		fw.write("M = 256");
+		fw.write("M = D");
 		fw.write(System.lineSeparator());
-		fw.write("call Sys.init");
-		fw.write(System.lineSeparator());
+		this.writeCall("Sys.init", 0);
 	}
 	
 	//label name
@@ -481,15 +485,174 @@ public class CodeWriter {
 	}
 	
 	public void writeCall(String functionName, int numArgs) throws IOException {
-		
-	}
-	
-	public void writeReturn() throws IOException {
-		fw.write("@" + funcName + returnAddress);
+		//push return address
+		fw.write("@" + functionName + "return" + Integer.toString(countCall));
 		fw.write(System.lineSeparator());
 		fw.write("D = A");
 		fw.write(System.lineSeparator());
 		this.pushCommand();
+		//push LCL
+		fw.write("@LCL");
+		fw.write(System.lineSeparator());
+		fw.write("D = M");
+		fw.write(System.lineSeparator());
+		this.pushCommand();
+		//push ARG
+		fw.write("@ARG");
+		fw.write(System.lineSeparator());
+		fw.write("D = M");
+		fw.write(System.lineSeparator());
+		this.pushCommand();
+		//push THIS
+		fw.write("@THIS");
+		fw.write(System.lineSeparator());
+		fw.write("D = M");
+		fw.write(System.lineSeparator());
+		this.pushCommand();
+		//push THAT
+		fw.write("@THAT");
+		fw.write(System.lineSeparator());
+		fw.write("D = M");
+		fw.write(System.lineSeparator());
+		this.pushCommand();
+		//Set ARG = SP - nargs - 5
+		fw.write("@SP");
+		fw.write(System.lineSeparator());
+		fw.write("D = M");
+		fw.write(System.lineSeparator());
+		fw.write("@" + Integer.toString(5 + numArgs));
+		fw.write(System.lineSeparator());
+		fw.write("D = D - A");
+		fw.write(System.lineSeparator());
+		fw.write("@ARG");
+		fw.write(System.lineSeparator());
+		fw.write("M = D");
+		fw.write(System.lineSeparator());
+		//Set LCL = SP
+		fw.write("@SP");
+		fw.write(System.lineSeparator());
+		fw.write("D = M");
+		fw.write(System.lineSeparator());
+		fw.write("@LCL");
+		fw.write(System.lineSeparator());
+		fw.write("M = D");
+		fw.write(System.lineSeparator());
+		//go to function
+		fw.write("@" + functionName);
+		fw.write(System.lineSeparator());
+		fw.write("0;JMP");
+		fw.write(System.lineSeparator());
+		//set return address label
+		fw.write("(" + functionName + "return" + Integer.toString(countCall) + ")");
+		fw.write(System.lineSeparator());
+		countCall++;
+	}
+	
+	public void writeReturn() throws IOException {
+		//store address in LCL to a temp location called FRAME
+		fw.write("@LCL");
+		fw.write(System.lineSeparator());
+		fw.write("D = M");
+		fw.write(System.lineSeparator());
+		fw.write("@FRAME");
+		fw.write(System.lineSeparator());
+		fw.write("M = D");
+		fw.write(System.lineSeparator());
+		fw.write("@5");
+		fw.write(System.lineSeparator());
+		fw.write("D = D - A"); //D = FRAME - 5
+		fw.write(System.lineSeparator());
+		fw.write("A = D"); //A = FRAME - 5
+		fw.write(System.lineSeparator());
+		fw.write("D = M"); //D = Mem[FRAME - 5]
+		fw.write(System.lineSeparator());
+		fw.write("@RET");
+		fw.write(System.lineSeparator());
+		fw.write("M = D"); //Mem[RET] = Mem[FRAME - 5]
+		fw.write(System.lineSeparator());
+		this.popCommand(); //pops return value and stores in register D
+		fw.write("@ARG");
+		fw.write(System.lineSeparator());
+		fw.write("A = M"); //A = Mem[ARG]
+		fw.write(System.lineSeparator());
+		fw.write("M = D"); //memory contains return value
+		fw.write(System.lineSeparator());
+		//set SP = ARG + 1
+		fw.write("@ARG");
+		fw.write(System.lineSeparator());
+		fw.write("D = M");
+		fw.write(System.lineSeparator());
+		fw.write("@SP");
+		fw.write(System.lineSeparator());
+		fw.write("M = D + 1");
+		fw.write(System.lineSeparator());
+		//restore THAT of caller
+		fw.write("@FRAME");
+		fw.write(System.lineSeparator());
+		fw.write("M = M - 1");
+		fw.write(System.lineSeparator());
+		fw.write("D = M");
+		fw.write(System.lineSeparator());
+		fw.write("A = D");
+		fw.write(System.lineSeparator());
+		fw.write("D = M");
+		fw.write(System.lineSeparator());
+		fw.write("@THAT");
+		fw.write(System.lineSeparator());
+		fw.write("M = D");
+		fw.write(System.lineSeparator());
+		//restore THIS of caller
+		fw.write("@FRAME");
+		fw.write(System.lineSeparator());
+		fw.write("M = M - 1");
+		fw.write(System.lineSeparator());
+		fw.write("D = M");
+		fw.write(System.lineSeparator());
+		fw.write("A = D");
+		fw.write(System.lineSeparator());
+		fw.write("D = M");
+		fw.write(System.lineSeparator());
+		fw.write("@THIS");
+		fw.write(System.lineSeparator());
+		fw.write("M = D");
+		fw.write(System.lineSeparator());
+		//restore ARG of caller
+		fw.write("@FRAME");
+		fw.write(System.lineSeparator());
+		fw.write("M = M - 1");
+		fw.write(System.lineSeparator());
+		fw.write("D = M");
+		fw.write(System.lineSeparator());
+		fw.write("A = D");
+		fw.write(System.lineSeparator());
+		fw.write("D = M");
+		fw.write(System.lineSeparator());
+		fw.write("@ARG");
+		fw.write(System.lineSeparator());
+		fw.write("M = D");
+		fw.write(System.lineSeparator());
+		//restore LCL of caller
+		fw.write("@FRAME");
+		fw.write(System.lineSeparator());
+		fw.write("M = M - 1");
+		fw.write(System.lineSeparator());
+		fw.write("D = M");
+		fw.write(System.lineSeparator());
+		fw.write("A = D");
+		fw.write(System.lineSeparator());
+		fw.write("D = M");
+		fw.write(System.lineSeparator());
+		fw.write("@LCL");
+		fw.write(System.lineSeparator());
+		fw.write("M = D");
+		fw.write(System.lineSeparator());
+		//go to return address
+		fw.write("@RET");
+		fw.write(System.lineSeparator());
+		fw.write("A = M");
+		fw.write(System.lineSeparator());
+		fw.write("0;JMP");
+		fw.write(System.lineSeparator());
 	}
 	
 	public void writeFunction(String functionName, int numLocals) throws IOException {
@@ -503,7 +666,7 @@ public class CodeWriter {
 			fw.write(System.lineSeparator());
 		}
 		//if there are k local variables, push 0 onto stack k times
-		for (int i = numLocals; i != 0; i++) {
+		for (int i = numLocals; i != 0; i--) {
 			this.pushCommand();
 		}
 	}
@@ -537,6 +700,10 @@ public class CodeWriter {
 	
 	public void Close() throws IOException {
 		fw.close();
+	}
+	
+	public void setStaticSubString(String test) {
+		staticSubString = test.replace(".vm", ".");
 	}
 
 }

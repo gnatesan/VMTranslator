@@ -14,14 +14,14 @@ public class Main {
 	int argument2;
 	String outFile;
 	
-	public Main(File fileName) throws IOException {
+	public Main(File fileName, String outFile) throws IOException {
+		outFile += ".asm";
 		isDirectory = false;
+		cw = new CodeWriter(new File(outFile));
 		if (fileName.isFile()) {
 			System.out.println("true");
 			p = new Parser(fileName);
-			outFile = fileName.getName().replace(".vm", ".asm");
-			//outFile = "out1.asm";
-			cw = new CodeWriter(new File(outFile));
+			System.out.println(outFile);
 		}
 		else if (fileName.isDirectory()) {
 			isDirectory = true;
@@ -29,8 +29,7 @@ public class Main {
 			allFiles = fileName.listFiles();
 			for (File f : allFiles) {
 				if (f.getName().endsWith(".vm")){
-					outFile = f.getName().replace(".vm", ".asm");
-					cw = new CodeWriter(new File(outFile));
+					//outFile = f.getName().replace(".vm", ".asm");
 					allParsers.add(new Parser(f));
 				}
 			}
@@ -39,6 +38,14 @@ public class Main {
 	
 	public void runProgram() throws IOException {
 		if (!isDirectory) {
+			/*if (p.getFileName().equals("Sys.vm")) {
+				cw.writeInit();
+			}
+			else while (p.hasMoreCommands()) {
+				p.advance();
+				writeOutput(p);
+			}*/
+			cw.writeInit();
 			while (p.hasMoreCommands()) {
 				p.advance();
 				writeOutput(p);
@@ -46,15 +53,17 @@ public class Main {
 			cw.Close();
 		}
 		else {
+			cw.writeInit();
 			for (Parser in : allParsers) {
-				outFile = in.getFileName().replace(".vm", ".asm");
-				cw.setFileName(outFile);
+				//outFile = in.getFileName().replace(".vm", ".asm");
+				//cw.setFileName(outFile);
+				cw.setStaticSubString(in.getFileName());
 				while (in.hasMoreCommands()) {
-					in.advance();
-					writeOutput(in);
+						in.advance();
+						writeOutput(in);
 				}
-				cw.Close();
 			}
+			cw.Close();
 		}
 	}
 	
@@ -98,12 +107,11 @@ public class Main {
 	public static void main(String[] args) {
 		File f = new File(args[0]);
 		try {
-			Main m = new Main(f);
+			Main m = new Main(f, args[1]);
 			m.runProgram();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} 
-		
 	}
 }
